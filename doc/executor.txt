@@ -1,0 +1,7 @@
+*executor.txt* Opens a terminal and excutes a command
+
+=====================================================
+CONTENTS                                        *Executor*
+
+TODO: documentation
+
