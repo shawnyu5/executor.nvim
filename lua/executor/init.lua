@@ -3,7 +3,8 @@ M = {}
 local function term_and_excute(command)
     -- get current tab number
     local current_tab = vim.fn.tabpagenr()
-    vim.cmd("write | tabe | term")
+    vim.cmd("write")
+    vim.cmd("tabe | term")
     -- move terminal to 1 before current tab, so closing terminal will land on the currect page
     vim.cmd("tabm " .. current_tab - 1)
     vim.fn.chansend(vim.b.terminal_job_id, command)
@@ -11,11 +12,75 @@ local function term_and_excute(command)
 end
 
 -- excutes file based on file type
-function M.executor()
+function M.executor(executorCommands)
+    executorCommands = executorCommands or nil
+
     local current_file_name = vim.fn.expand("%")
-    local filetype = vim.bo.filetype
+    local current_filetype = vim.bo.filetype
+    -- print(vim.fn.exists("vim.g.executorCommands"))
+    if executorCommands == nil then
+        -- print("table is nil, filling table")
+        executorCommands = {
+            cpp = {
+                "make",
+                "g++ %"
+            },
+            python = {
+                "python3 %"
+            },
+            javascript = {
+                "nodemon %"
+            },
+            sh = {
+                "bash %"
+            },
+            vim = {
+                "source %",
+                extern = false
+            },
+            lua = {
+                "luafile %",
+                extern = false
+            }
+        }
+    end
+
+    -- print(vim.inspect(executorCommands))
+    for filetype, command in pairs(executorCommands) do
+        -- print("iteration " .. iteration)
+        -- print("current file type: " .. filetype)
+        if current_filetype == filetype then
+            -- print("command table is " .. vim.inspect(command))
+            -- loop through command table
+            for i = 1, #command do
+                -- print("command is ", command[i])
+                -- print("extern:", command.extern)
+                if command.extern == false then
+                    -- print("COMMAND: " .. command[i])
+                    vim.cmd(command[i])
+                    break   -- don't keep checking after command has been excuted
+                else
+                    term_and_excute(command[i] .. "\n")
+                    break
+                end
+            end
+        end
+    end
+end
+
+-- M.executor()
+    -- check for the existance of a make file
+    -- if i == "make" then
+        -- local files = vim.fn.system("ls")
+        -- if string.find(files, "makefile") or string.find(files, "Makefile") then
+            -- local excute_command = i .. " && exit"
+            -- term_and_excute(excute_command)
+        -- end
+    -- end
+
     -- print("file type is " .. filetype)
 
+    --[[
     if filetype == "python" then
         -- print("file type is python")
         local command = "python3 " .. current_file_name .. "&& exit\n"
@@ -57,7 +122,7 @@ function M.executor()
     else
         print("No mapping created")
     end
-end
+    ]]
 
 
 -- exists and closes all term buffers
