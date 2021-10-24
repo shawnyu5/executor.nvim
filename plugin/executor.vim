@@ -1,9 +1,11 @@
 " echo "hiii"
 " echo g:executor_map_keys
+
+" reload this package
 lua package.loaded["executor"] = nil
 
-nnoremap <Plug>executor <Cmd>lua require("executor").executor()<CR>
-nnoremap <Plug>termClose <Cmd>lua require("executor").term_closer()<CR>
+" nnoremap <Plug>executor <Cmd>lua require("executor").executor()<CR>
+" nnoremap <Plug>termClose <Cmd>lua require("executor").term_closer()<CR>
 
 if !exists('g:executor_map_keys')
     let g:executor_map_keys = 1
