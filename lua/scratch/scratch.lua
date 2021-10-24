@@ -1,28 +1,8 @@
-local executorCommands = {
-    cpp = {
-        "make",
-        "g++ %"
-    },
-    python = {
-        "python3 %"
-    },
-    javascript = {
-        "nodemon %"
-    },
-    sh = {
-        "bash %"
-    },
-    vim = {
-        "source %",
-        extern = false
-    },
-    lua = {
-        "luafile %",
-        extern = false
-    }
-}
-
-local string = "hello %"
-
-print(string)
-print(string.gsub(string, "%%", "worlddd"))
+local i, t, popen = 0, {}, io.popen
+local pfile = popen('ls -a')
+for filename in pfile:lines() do
+    i = i + 1
+    t[i] = filename
+end
+pfile:close()
+print(vim.inspect(t))

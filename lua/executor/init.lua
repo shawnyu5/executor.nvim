@@ -1,4 +1,8 @@
 M = {}
+Executor_commands = {}
+
+local utils = require("executor.utils")
+
 -- opens a terminal in new tab and excute command
 local function term_and_excute(command)
     -- get current tab number
@@ -12,67 +16,47 @@ local function term_and_excute(command)
 end
 
 
--- set default values for executor
-local function set_default_values()
-    return {
-        cpp = {
-            "make",
-            "g++ %"
-        },
-        python = {
-            "python3 %"
-        },
-        javascript = {
-            "nodemon %"
-        },
-        sh = {
-            "bash %"
-        },
-        vim = {
-            "source %",
-            extern = false
-        },
-        lua = {
-            "luafile %",
-            extern = false
-        }
-    }
+function M.setup(settings)
+    if settings == nil then
+        Executor_commands = utils.set_default_values()
+        -- nnoremap <leader>m :lua require("executor").executor()<CR>
+        -- nnoremap <leader>ct :lua require("executor").term_closer()<CR>
+        vim.api.nvim_set_keymap("n", "<leader>m", ":lua require('executor').executor()<CR>", {silent = false})
+        vim.api.nvim_set_keymap("n", "<leader>ct", ":lua require('executor').term_closer()<CR>", {silent = false})
+    else
+        Executor_commands = settings.command
+    end
 end
 
--- replace % with current file name and appends ` && exit` to command
-local function replace_filename(command, current_file_name)
-    return string.gsub(command, "%%", current_file_name) .. " && exit"
-end
-
--- checks for a file's existance in the current dir
-local function check_file_existance(file)
-    local files =
-end
 -- excutes file based on file type
 function M.executor(executorCommands)
-    executorCommands = executorCommands or nil
-    if executorCommands == nil then
-        executorCommands = set_default_values()
-    end
-
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
 
-    for filetype, command in pairs(executorCommands) do
+    for filetype, command_tbl in pairs(Executor_commands) do
         if current_filetype == filetype then
             -- loop through command table and excute command
-            for i = 1, #command do
-                check_file_existance(command)
+            for i = 1, #command_tbl do
+                local current_command = command_tbl[i]
+
+                print("checking dependencies...")
+                -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
+                if not utils.is_dependency(current_command, Executor_commands.dependency_commands) then
+                    print("dependency for " .. current_command .. " not found")
+                    -- if dependency not found, skip command
+                    goto continue
+                end
                 -- if extern, execute command in external terminal
-                if command.extern == false then
-                    vim.cmd(command[i])
+                if command_tbl.extern == false then
+                    vim.cmd(current_command)
                     -- don't keep checking after command has been excuted
                     break
                 else
-                    command[i] = replace_filename(command[i], current_file_name)
-                    term_and_excute(command[i] .. "\n")
+                    current_command = utils.replace_filename(current_command, current_file_name)
+                    term_and_excute(current_command .. "\n")
                     break
                 end
+                ::continue::
             end
         end
     end
@@ -97,8 +81,8 @@ function M.term_closer()
 
     -- go to all windows, send tell terminal to exit and close tab
     for i = 1, #win_ids do
+        vim.fn.win_gotoid(win_ids[i])
         vim.cmd("bd!")
-        -- vim.fn.win_gotoid(win_ids[i])
         -- vim.fn.chansend(vim.b.terminal_job_id, "\n\nexit\n") --send exit key
         -- vim.fn.win_execute(win_ids[i], "close") -- close window
     end
