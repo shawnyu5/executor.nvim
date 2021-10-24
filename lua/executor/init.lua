@@ -11,6 +11,40 @@ local function term_and_excute(command)
     vim.cmd("norm! i")
 end
 
+
+-- set default values for executor
+local function set_default_values()
+    return {
+        cpp = {
+            "make",
+            "g++ %"
+        },
+        python = {
+            "python3 %"
+        },
+        javascript = {
+            "nodemon %"
+        },
+        sh = {
+            "bash %"
+        },
+        vim = {
+            "source %",
+            extern = false
+        },
+        lua = {
+            "luafile %",
+            extern = false
+        }
+    }
+end
+
+-- replace % with current file name
+local function replace_filename(command, current_file_name)
+    return string.gsub(command, "%%", current_file_name)
+end
+
+
 -- excutes file based on file type
 function M.executor(executorCommands)
     executorCommands = executorCommands or nil
@@ -20,47 +54,26 @@ function M.executor(executorCommands)
     -- print(vim.fn.exists("vim.g.executorCommands"))
     if executorCommands == nil then
         -- print("table is nil, filling table")
-        executorCommands = {
-            cpp = {
-                "make",
-                "g++ %"
-            },
-            python = {
-                "python3 %"
-            },
-            javascript = {
-                "nodemon %"
-            },
-            sh = {
-                "bash %"
-            },
-            vim = {
-                "source %",
-                extern = false
-            },
-            lua = {
-                "luafile %",
-                extern = false
-            }
-        }
+        executorCommands = set_default_values()
     end
 
     -- print(vim.inspect(executorCommands))
     for filetype, command in pairs(executorCommands) do
         -- print("iteration " .. iteration)
-        -- print("current file type: " .. filetype)
         if current_filetype == filetype then
             -- print("command table is " .. vim.inspect(command))
+
             -- loop through command table
             for i = 1, #command do
-                -- print("command is ", command[i])
-                -- print("extern:", command.extern)
+                -- if extern, execute command in external terminal
                 if command.extern == false then
-                    -- print("COMMAND: " .. command[i])
-                    vim.cmd(command[i])
+                    print("COMMAND: " .. command[i])
+                    -- vim.cmd(command[i])
                     break   -- don't keep checking after command has been excuted
                 else
-                    term_and_excute(command[i] .. "\n")
+                    command[i] = replace_filename(command[i], current_file_name)
+                    print("term_and_excute: " .. command[i])
+                    -- term_and_excute(command[i] .. "\n")
                     break
                 end
             end
@@ -69,6 +82,7 @@ function M.executor(executorCommands)
 end
 
 -- M.executor()
+
     -- check for the existance of a make file
     -- if i == "make" then
         -- local files = vim.fn.system("ls")

@@ -22,19 +22,7 @@ local executorCommands = {
     }
 }
 
-local stuff = {
-    "shawn",
-    "apple"
-}
+local string = "hello %"
 
--- print(vim.inspect(executorCommands))
--- for i = 1, #stuff do
-    -- print(stuff[i])
--- end
-
-local iteration = 1
-for key, value in pairs(executorCommands) do
-    print("iteration " .. iteration)
-    print(key, vim.inspect(value))
-    iteration = iteration + 1
-end
+print(string)
+print(string.gsub(string, "%%", "worlddd"))
