@@ -24,11 +24,11 @@ require("executor").setup({
             "luafile %",
             extern = false
         }
-    }
-    default_mappings = true
+    },
+    default_mappings = true,
 
     dependency_commands = {
-        make = makefile
+        make = "makefile"
     }
 }
 ```
@@ -46,4 +46,5 @@ file is required, it checks `cwd` for the file
 
    * `local function is_dependency(command)` - takes a command and parses the
    keys in the `dependency_commands` table. If the dependency is found, we check
-   if it exist in current directory
+   if it exist in current directory. If the dependency exists, return true, if
+   not found, return false. If not a dependency_commands, return nil

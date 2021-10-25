@@ -1,6 +1,12 @@
 M = {}
 Executor_commands = {}
 
+if vim.fn.exists("vim.g.executor_loaded") then
+    return
+end
+
+vim.g.executor_loaded = 0
+
 local utils = require("executor.utils")
 
 -- opens a terminal in new tab and excute command
@@ -16,6 +22,7 @@ local function term_and_excute(command)
 end
 
 
+-- sets up executor
 function M.setup(settings)
     if settings == nil then
         Executor_commands = utils.set_default_values()
@@ -29,7 +36,7 @@ function M.setup(settings)
 end
 
 -- excutes file based on file type
-function M.executor(executorCommands)
+function M.executor()
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
 
@@ -39,10 +46,9 @@ function M.executor(executorCommands)
             for i = 1, #command_tbl do
                 local current_command = command_tbl[i]
 
-                print("checking dependencies...")
                 -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
-                if not utils.is_dependency(current_command, Executor_commands.dependency_commands) then
-                    print("dependency for " .. current_command .. " not found")
+                if utils.is_dependency(current_command, Executor_commands.dependency_commands) == false then
+                    -- NOTE: must explicately == false, other wise nil will be picked up as false too
                     -- if dependency not found, skip command
                     goto continue
                 end
@@ -62,7 +68,6 @@ function M.executor(executorCommands)
     end
 end
 
--- M.executor()
 
 -- exists and closes all term buffers
 function M.term_closer()
