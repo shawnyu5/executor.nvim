@@ -12,7 +12,7 @@ function M.set_default_values()
                 "python3 %"
             },
             javascript = {
-                "nodemon %"
+                "node %"
             },
             sh = {
                 "bash %"
