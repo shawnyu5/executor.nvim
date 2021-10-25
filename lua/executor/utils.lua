@@ -38,25 +38,27 @@ function M.replace_filename(command, current_file_name)
 end
 
 function M.is_dependency(command, list)
-    -- print(vim.inspect(list))
-    print("command arg is " .. command)
     for current_command, dependency in pairs(list) do
-        print("current command is " .. current_command)
-        if command == current_command then
+        if current_command == command then
+            -- if dependency file is not in cwd,  then return false
             if M.validate_cwd_file(dependency) then
                 return true
+            else
+                return false
             end
         end
     end
-    return false
+    -- else if command is not a dependency_command, return nilo
+    return nil
 end
 
 -- check if the file passed in is in cwd
 function M.validate_cwd_file(file_name)
     local cwd_files = vim.fn.system("ls")
-    print("cwd files are " .. cwd_files)
-    print("file name is " .. file_name)
-    if cwd_files == file_name then
+    -- print("cwd files are " .. cwd_files)
+    -- print("file name is " .. file_name)
+
+    if string.find(cwd_files, string.lower(file_name)) then
         return true
     else
         return false
