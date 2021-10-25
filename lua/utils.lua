@@ -3,26 +3,28 @@ M = {}
 -- set default values for executor
 function M.set_default_values()
     Executor_commands = {
-        cpp = {
-            "make",
-            "g++ %"
-        },
-        python = {
-            "python3 %"
-        },
-        javascript = {
-            "nodemon %"
-        },
-        sh = {
-            "bash %"
-        },
-        vim = {
-            "source %",
-            extern = false
-        },
-        lua = {
-            "luafile %",
-            extern = false
+        commands = {
+            cpp = {
+                "make",
+                "g++ %"
+            },
+            python = {
+                "python3 %"
+            },
+            javascript = {
+                "nodemon %"
+            },
+            sh = {
+                "bash %"
+            },
+            vim = {
+                "source %",
+                extern = false
+            },
+            lua = {
+                "luafile %",
+                extern = false
+            }
         },
         default_mappings = true,
         dependency_commands = {
@@ -37,6 +39,7 @@ function M.replace_filename(command, current_file_name)
     return string.gsub(command, "%%", current_file_name) .. " && exit"
 end
 
+-- check if current command requires a dependency file
 function M.is_dependency(command, list)
     for current_command, dependency in pairs(list) do
         if current_command == command then
@@ -55,8 +58,6 @@ end
 -- check if the file passed in is in cwd
 function M.validate_cwd_file(file_name)
     local cwd_files = vim.fn.system("ls")
-    -- print("cwd files are " .. cwd_files)
-    -- print("file name is " .. file_name)
 
     if string.find(cwd_files, string.lower(file_name)) then
         return true

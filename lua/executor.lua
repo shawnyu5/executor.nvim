@@ -1,7 +1,7 @@
-M = {}
-Executor_commands = {}
+local M = {}
+local Executor_commands = {}
 
-local utils = require("executor.utils")
+local utils = require("utils")
 
 -- opens a terminal in new tab and excute command
 local function term_and_excute(command)
@@ -18,14 +18,19 @@ end
 
 -- sets up executor
 function M.setup(settings)
+    -- print(vim.inspect(settings))
+    -- if no settings passed in, then set to default values
     if settings == nil then
         Executor_commands = utils.set_default_values()
-        -- nnoremap <leader>m :lua require("executor").executor()<CR>
-        -- nnoremap <leader>ct :lua require("executor").term_closer()<CR>
+    else
+        -- else set to settings table passed in
+        Executor_commands = settings
+    end
+
+    -- if default mappings, map keys
+    if Executor_commands.default_mappings then
         vim.api.nvim_set_keymap("n", "<leader>m", ":lua require('executor').executor()<CR>", {silent = false})
         vim.api.nvim_set_keymap("n", "<leader>ct", ":lua require('executor').term_closer()<CR>", {silent = false})
-    else
-        Executor_commands = settings.command
     end
 end
 
@@ -33,16 +38,20 @@ end
 function M.executor()
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
+    -- print(vim.inspect(Executor_commands))
 
-    for filetype, command_tbl in pairs(Executor_commands) do
+    for filetype, command_tbl in pairs(Executor_commands.commands) do
+        -- print("current filetype: " .. current_filetype)
+        -- print("iterstion file type: " .. filetype)
         if current_filetype == filetype then
             -- loop through command table and excute command
             for i = 1, #command_tbl do
                 local current_command = command_tbl[i]
+                -- print("current command: ", current_command)
 
                 -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
                 if utils.is_dependency(current_command, Executor_commands.dependency_commands) == false then
-                    -- NOTE: must explicately == false, other wise nil will be picked up as false too
+                    -- NOTE: must explicately `== false` rather than `not`, other wise nil will be picked up as false too
 
                     -- if dependency not found, skip command
                     goto continue
@@ -51,11 +60,11 @@ function M.executor()
                 if command_tbl.extern == false then
                     vim.cmd(current_command)
                     -- don't keep checking after command has been excuted
-                    break
+                    return
                 else
                     current_command = utils.replace_filename(current_command, current_file_name)
                     term_and_excute(current_command .. "\n")
-                    break
+                    return
                 end
                 print("No mapping defined")
                 ::continue::
