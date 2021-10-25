@@ -1,12 +1,6 @@
 M = {}
 Executor_commands = {}
 
--- if vim.fn.exists("vim.g.executor_loaded") then
-    -- return
--- end
-
--- vim.g.executor_loaded = 0
-
 local utils = require("executor.utils")
 
 -- opens a terminal in new tab and excute command
@@ -49,6 +43,7 @@ function M.executor()
                 -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
                 if utils.is_dependency(current_command, Executor_commands.dependency_commands) == false then
                     -- NOTE: must explicately == false, other wise nil will be picked up as false too
+
                     -- if dependency not found, skip command
                     goto continue
                 end
@@ -62,6 +57,7 @@ function M.executor()
                     term_and_excute(current_command .. "\n")
                     break
                 end
+                print("No mapping defined")
                 ::continue::
             end
         end
