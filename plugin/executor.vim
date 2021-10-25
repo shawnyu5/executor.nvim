@@ -11,6 +11,10 @@ if g:executor_map_keys == 1
     nnoremap <leader>ct :lua require("executor").term_closer()<CR>
 endif
 
+lua << EOF
+    require("executor").setup()
+EOF
+
 
 augroup Executor
     autocmd!

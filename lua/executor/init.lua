@@ -1,17 +1,13 @@
 M = {}
 Executor_commands = {}
 
-if vim.fn.exists("vim.g.executor_loaded") then
-    return
-end
+-- if vim.fn.exists("vim.g.executor_loaded") then
+    -- return
+-- end
 
-vim.g.executor_loaded = 0
+-- vim.g.executor_loaded = 0
 
 local utils = require("executor.utils")
-
-function M.hello()
-    print("hello world")
-end
 
 -- opens a terminal in new tab and excute command
 local function term_and_excute(command)
