@@ -38,7 +38,6 @@ end
 function M.executor()
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
-    -- print(vim.inspect(Executor_commands))
 
     for filetype, command_tbl in pairs(Executor_commands.commands) do
         -- print("current filetype: " .. current_filetype)
@@ -59,16 +58,17 @@ function M.executor()
                 -- if extern, execute command in external terminal
                 if command_tbl.extern == false then
                     vim.cmd(current_command)
-                    -- don't keep checking after command has been excuted
+                    -- stop after command has been excuted
                     return
                 else
                     current_command = utils.replace_filename(current_command, current_file_name)
                     term_and_excute(current_command .. "\n")
                     return
                 end
-                print("No mapping defined")
                 ::continue::
             end
+            -- if command is excuted, for loop should not finish. Only when there are no commands defined for current filetype the forloop exits.
+            print("No mapping defined")
         end
     end
 end

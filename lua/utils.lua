@@ -51,7 +51,7 @@ function M.is_dependency(command, list)
             end
         end
     end
-    -- else if command is not a dependency_command, return nilo
+    -- else if command is not a dependency_command, return nil
     return nil
 end
 
