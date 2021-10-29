@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 -- set default values for executor
 function M.set_default_values()
