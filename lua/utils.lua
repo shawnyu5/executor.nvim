@@ -2,11 +2,11 @@ local M = {}
 
 -- set default values for executor
 function M.set_default_values()
-    Executor_commands = {
+    return {
         commands = {
             cpp = {
                 "make",
-                "g++ %"
+                "g++ % && ./a.out"
             },
             python = {
                 "python3 %"
@@ -31,7 +31,6 @@ function M.set_default_values()
             make = "makefile"
         }
     }
-    return Executor_commands
 end
 
 -- replace % with current file name and appends ` && exit` to command
