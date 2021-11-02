@@ -1,6 +1,9 @@
 # executor.nvim
 
-Compiles / executes the current file(s) based on file type.
+Compiles / executes the current file(s) based on file type in a new terminal
+tab and exits.
+
+Requires neovim >= 5.0
 
 ## Set up
 
@@ -29,7 +32,7 @@ Executor comes with the following defaults:
         cpp = {
             -- command(s) to excute
             "make",
-            "g++ %" -- `%` represent the current file name
+            "g++ % && ./a.out" -- `%` represent the current file name
         },
         python = {
             "python3 %"
@@ -64,6 +67,9 @@ Executor comes with the following defaults:
      }
 }
 ```
+
+**Note:** all external commands are ran with `&& exit || exit` appended to the
+command to cause terminal to exit.
 
 ## Key mappings
 
