@@ -33,9 +33,9 @@ function M.set_default_values()
     }
 end
 
--- replace % with current file name and appends ` && exit` to command
+-- replace % with current file name and appends ` && exit || exit` to command
 function M.replace_filename(command, current_file_name)
-    return string.gsub(command, "%%", current_file_name) .. " && exit"
+    return string.gsub(command, "%%", current_file_name) .. " && exit || exit"
 end
 
 -- check if current command requires a dependency file
