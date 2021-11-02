@@ -59,6 +59,8 @@ Executor comes with the following defaults:
 
     },
      default_mappings = true, -- use default mapping
+    always_exit = true, -- always exit terminal no matter status of previous
+    command
 
      dependency_commands = {
          -- the command make requires the presents of a makefile in cwd, if
@@ -68,8 +70,9 @@ Executor comes with the following defaults:
 }
 ```
 
-**Note:** all external commands are ran with `&& exit || exit` appended to the
-command to cause terminal to exit.
+Set `always_exit` to true will run exit after the command no matter the status
+of the previous command. When set to false, it will only exit when previous
+command succeeds.
 
 ## Key mappings
 

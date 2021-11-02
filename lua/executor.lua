@@ -61,7 +61,7 @@ function M.executor()
                     -- stop after command has been excuted
                     return
                 else
-                    current_command = utils.replace_filename(current_command, current_file_name)
+                    current_command = utils.replace_filename(current_command, current_file_name, Executor_commands.always_exit)
                     term_and_excute(current_command .. "\n")
                     return
                 end

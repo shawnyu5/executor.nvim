@@ -27,6 +27,7 @@ function M.set_default_values()
             }
         },
         default_mappings = true,
+        always_exit = true, -- always exit terminal no matter status of previous
         dependency_commands = {
             make = "makefile"
         }
@@ -34,8 +35,12 @@ function M.set_default_values()
 end
 
 -- replace % with current file name and appends ` && exit || exit` to command
-function M.replace_filename(command, current_file_name)
-    return string.gsub(command, "%%", current_file_name) .. " && exit || exit"
+function M.replace_filename(command, current_file_name, always_exit)
+    if always_exit then
+        return string.gsub(command, "%%", current_file_name) .. " && exit || exit"
+    else
+        return string.gsub(command, "%%", current_file_name) .. " && exit"
+    end
 end
 
 -- check if current command requires a dependency file
