@@ -1,6 +1,6 @@
 local M = {}
-local executor_commands = {}
-
+-- local executor_commands = {}
+M.executor_commands = {}
 local utils = require("utils")
 
 -- opens a terminal in new tab and excute command
@@ -21,14 +21,14 @@ function M.setup(settings)
     -- print(vim.inspect(settings))
     -- if no settings passed in, then set to default values
     if settings == nil then
-        executor_commands = utils.set_default_values()
+        M.executor_commands = utils.set_default_values()
     else
         -- else set to settings table passed in
-        executor_commands = settings
+        M.executor_commands = settings
     end
 
     -- if default mappings, map keys
-    if executor_commands.default_mappings then
+    if M.executor_commands.default_mappings then
         vim.api.nvim_set_keymap("n", "<leader>m", ":lua require('executor').executor()<CR>", {silent = false})
         vim.api.nvim_set_keymap("n", "<leader>ct", ":lua require('executor').term_closer()<CR>", {silent = false})
     end
@@ -39,7 +39,7 @@ function M.executor()
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
 
-    for filetype, command_tbl in pairs(executor_commands.commands) do
+    for filetype, command_tbl in pairs(M.executor_commands.commands) do
         -- print("current filetype: " .. current_filetype)
         -- print("iterstion file type: " .. filetype)
         if current_filetype == filetype then
@@ -49,29 +49,25 @@ function M.executor()
                 -- print("current command: ", current_command)
 
                 -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
-                if utils.is_dependency(current_command, executor_commands.dependency_commands) == false then
+                if utils.is_dependency(current_command, M.executor_commands.dependency_commands) == false then
                     -- NOTE: must explicately `== false` rather than `not`, other wise nil will be picked up as false too
 
                     -- if dependency not found, skip command
-                    goto continue
-                end
+                    goto continue end
                 -- if extern, execute command in external terminal
-                if command_tbl.extern == false then
-                    vim.cmd(current_command)
+                if command_tbl.extern == false then vim.cmd(current_command)
                     -- stop after command has been excuted
                     return
-                else
-                    current_command = utils.replace_filename(current_command, current_file_name, executor_commands.always_exit)
+                else current_command = utils.replace_filename(current_command, current_file_name, M.executor_commands.always_exit)
                     term_and_excute(current_command .. "\n")
                     return
                 end
                 ::continue::
             end
-            -- if command is excuted, for loop should not finish. Only when there are no commands defined for current filetype the forloop exits.
-            print("No mapping defined")
-        end
-    end
-end
+            -- if command is excuted, for loop should not finish. Only when
+            -- there are no commands defined for current filetype the forloop
+            -- exits.
+            print("No mapping defined") end end end
 
 
 -- exists and closes all term buffers
@@ -101,4 +97,5 @@ function M.term_closer()
 
 end
 
+-- print(vim.inspect(M))
 return M

@@ -1,5 +1,11 @@
-local tbl = {
-    name = "shawn"
-}
+local M = {}
 
-print(tbl.name)
+function M.commands()
+    return {
+        name = "shawn"
+    }
+end
+
+print(M.commands.name)
+
+return M

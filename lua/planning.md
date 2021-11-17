@@ -1,3 +1,9 @@
+<!-- vim-markdown-toc GFM -->
+
+* [Changing commands](#changing-commands)
+
+<!-- vim-markdown-toc -->
+
 User pass in a table with a list of file types and commands:
 
 ```lua
@@ -48,3 +54,13 @@ file is required, it checks `cwd` for the file
    keys in the `dependency_commands` table. If the dependency is found, we check
    if it exist in current directory. If the dependency exists, return true, if
    not found, return false. If not a dependency_commands, return nil
+
+## Changing commands
+
+The user should execute something like:
+
+```lua
+lua require("executor").commands.cpp = "g++ %"
+```
+
+**Consider** making the change per project.
