@@ -1,7 +1,7 @@
 # executor.nvim
 
 Compiles / executes the current file(s) based on file type in a new terminal
-tab and exits.
+tab and exits when commands completes.
 
 Requires neovim >= 5.0
 
