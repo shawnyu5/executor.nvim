@@ -1,6 +1,5 @@
-
 local M = {}
-local Executor_commands = {}
+local executor_commands = {}
 
 local utils = require("utils")
 
@@ -22,14 +21,14 @@ function M.setup(settings)
     -- print(vim.inspect(settings))
     -- if no settings passed in, then set to default values
     if settings == nil then
-        Executor_commands = utils.set_default_values()
+        executor_commands = utils.set_default_values()
     else
         -- else set to settings table passed in
-        Executor_commands = settings
+        executor_commands = settings
     end
 
     -- if default mappings, map keys
-    if Executor_commands.default_mappings then
+    if executor_commands.default_mappings then
         vim.api.nvim_set_keymap("n", "<leader>m", ":lua require('executor').executor()<CR>", {silent = false})
         vim.api.nvim_set_keymap("n", "<leader>ct", ":lua require('executor').term_closer()<CR>", {silent = false})
     end
@@ -40,7 +39,7 @@ function M.executor()
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
 
-    for filetype, command_tbl in pairs(Executor_commands.commands) do
+    for filetype, command_tbl in pairs(executor_commands.commands) do
         -- print("current filetype: " .. current_filetype)
         -- print("iterstion file type: " .. filetype)
         if current_filetype == filetype then
@@ -50,7 +49,7 @@ function M.executor()
                 -- print("current command: ", current_command)
 
                 -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
-                if utils.is_dependency(current_command, Executor_commands.dependency_commands) == false then
+                if utils.is_dependency(current_command, executor_commands.dependency_commands) == false then
                     -- NOTE: must explicately `== false` rather than `not`, other wise nil will be picked up as false too
 
                     -- if dependency not found, skip command
@@ -62,7 +61,7 @@ function M.executor()
                     -- stop after command has been excuted
                     return
                 else
-                    current_command = utils.replace_filename(current_command, current_file_name, Executor_commands.always_exit)
+                    current_command = utils.replace_filename(current_command, current_file_name, executor_commands.always_exit)
                     term_and_excute(current_command .. "\n")
                     return
                 end
