@@ -63,4 +63,8 @@ The user should execute something like:
 lua require("executor").commands.cpp = "g++ %"
 ```
 
+Currently, the commands table is contained in the `executor_commands` table. The
+user should be exposed to the `commands` table contained within
+`executor_commands`... TODO:  figure out how
+
 **Consider** making the change per project.
