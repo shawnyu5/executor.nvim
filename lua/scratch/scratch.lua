@@ -1,8 +1,25 @@
-local i, t, popen = 0, {}, io.popen
-local pfile = popen('ls -a')
-for filename in pfile:lines() do
-    i = i + 1
-    t[i] = filename
+local M = {}
+
+local tbl = {
+    names = {
+        person1 = "john",
+        person2 = "shawn"
+    }
+}
+
+local function names()
+    return tbl.names
 end
-pfile:close()
-print(vim.inspect(t))
+
+local nested = names()
+
+print("og table", vim.inspect(tbl))
+print("names table", vim.inspect(nested))
+nested.person1 = "random person"
+
+print("person 1 modified")
+
+print("og table", vim.inspect(tbl))
+print("names table", vim.inspect(nested))
+
+return M

@@ -1,7 +1,6 @@
 local M = {}
-local Executor_commands = {}
-
 local utils = require("utils")
+local executor_settings = {}
 
 -- opens a terminal in new tab and excute command
 local function term_and_excute(command)
@@ -18,17 +17,18 @@ end
 
 -- sets up executor
 function M.setup(settings)
-    -- print(vim.inspect(settings))
     -- if no settings passed in, then set to default values
     if settings == nil then
-        Executor_commands = utils.set_default_values()
+        executor_settings = utils.set_default_values()
     else
-        -- else set to settings table passed in
-        Executor_commands = settings
+        -- else set to settings table passed in by user
+        executor_settings = settings
     end
+    -- expose commands table to global name space, easily acessable by user
+    M.commands = executor_settings.commands
 
     -- if default mappings, map keys
-    if Executor_commands.default_mappings then
+    if executor_settings.default_mappings then
         vim.api.nvim_set_keymap("n", "<leader>m", ":lua require('executor').executor()<CR>", {silent = false})
         vim.api.nvim_set_keymap("n", "<leader>ct", ":lua require('executor').term_closer()<CR>", {silent = false})
     end
@@ -39,42 +39,39 @@ function M.executor()
     local current_file_name = vim.fn.expand("%")
     local current_filetype = vim.bo.filetype
 
-    for filetype, command_tbl in pairs(Executor_commands.commands) do
-        -- print("current filetype: " .. current_filetype)
-        -- print("iterstion file type: " .. filetype)
+    for filetype, command_tbl in pairs(executor_settings.commands) do
         if current_filetype == filetype then
             -- loop through command table and excute command
             for i = 1, #command_tbl do
                 local current_command = command_tbl[i]
-                -- print("current command: ", current_command)
 
-                -- check if current command requires a helper file in cwd, ie `make` -> `makefile`
-                if utils.is_dependency(current_command, Executor_commands.dependency_commands) == false then
+                -- check if current command requires a dependency file in cwd, ie `make` -> `makefile`
+                if utils.is_dependency(current_command, executor_settings.dependency_commands) == false then
                     -- NOTE: must explicately `== false` rather than `not`, other wise nil will be picked up as false too
-
                     -- if dependency not found, skip command
-                    goto continue
-                end
+                    goto continue end
+
                 -- if extern, execute command in external terminal
-                if command_tbl.extern == false then
-                    vim.cmd(current_command)
+                if command_tbl.extern == false then vim.cmd(current_command)
                     -- stop after command has been excuted
                     return
-                else
-                    current_command = utils.replace_filename(current_command, current_file_name, Executor_commands.always_exit)
+                else current_command = utils.replace_filename(current_command, current_file_name, executor_settings.always_exit)
                     term_and_excute(current_command .. "\n")
                     return
                 end
-                ::continue::
+                    ::continue::
+                end
+
+                -- if command is excuted, for loop should not finish. Only when
+                -- there are no commands defined for current filetype the forloop
+                -- exits.
+                print("No mapping defined")
             end
-            -- if command is excuted, for loop should not finish. Only when there are no commands defined for current filetype the forloop exits.
-            print("No mapping defined")
         end
     end
-end
 
 
--- exists and closes all term buffers
+-- closes all terminal windows
 function M.term_closer()
     local win_ids = {}
     -- remember current window
@@ -93,12 +90,18 @@ function M.term_closer()
     for i = 1, #win_ids do
         vim.fn.win_gotoid(win_ids[i])
         vim.cmd("bd!")
-        -- vim.fn.chansend(vim.b.terminal_job_id, "\n\nexit\n") --send exit key
-        -- vim.fn.win_execute(win_ids[i], "close") -- close window
     end
     -- go back to the window we started with
     vim.fn.win_gotoid(current_window)
 
 end
+
+-- query to return commands table
+local function commands()
+    return executor_settings.commands
+end
+
+-- M.setup()
+
 
 return M
