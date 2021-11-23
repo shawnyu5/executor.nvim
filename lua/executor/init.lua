@@ -1,5 +1,5 @@
 local M = {}
-local utils = require("utils")
+local utils = require("executor.utils")
 local executor_settings = {}
 
 -- opens a terminal in new tab and excute command
