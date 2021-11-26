@@ -96,12 +96,5 @@ function M.term_closer()
 
 end
 
--- query to return commands table
-local function commands()
-    return executor_settings.commands
-end
-
--- M.setup()
-
 
 return M

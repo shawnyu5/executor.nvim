@@ -1,6 +1,7 @@
 <!-- vim-markdown-toc GFM -->
 
 * [Changing commands](#changing-commands)
+    * [Idea 2](#idea-2)
 
 <!-- vim-markdown-toc -->
 
@@ -55,7 +56,7 @@ file is required, it checks `cwd` for the file
    if it exist in current directory. If the dependency exists, return true, if
    not found, return false. If not a dependency_commands, return nil
 
-## Changing commands
+# Changing commands
 
 The user should execute something like:
 
@@ -68,3 +69,12 @@ user should be exposed to the `commands` table contained within
 `executor_commands`... TODO:  figure out how
 
 **Consider** making the change per project.
+
+## Idea 2
+
+Have a modify module. The user can call `:lua require("executor").modify`, which
+will prompt user input with the entire command table in:
+
+   * via `input()`?
+
+   * in a pop up?
