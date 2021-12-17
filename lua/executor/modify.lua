@@ -20,6 +20,17 @@ local function valid_input(user_input)
     return false
 end
 
+-- returns the value at a certain numeric index
+local function index(number)
+    local count = 0
+    for key in pairs(commands) do
+        if count == number then
+            return commands[key]
+        end
+        count = count + 1
+    end
+end
+
 
 local function modify()
     local tmp_file_types = vim.tbl_keys(commands)
@@ -28,18 +39,23 @@ local function modify()
         file_types = file_types .. i .. ". " .. tmp_file_types[i] .. '\n'
     end
     local user_input = vim.fn.input("Configured lanuages:\n" .. file_types .. "> ")
-    -- if user didn't enter anything, then return
+    -- if user didn't enter anything, then end function
     if user_input == "" then
         return
     end
 
-    -- if user input invalid, send error message
+    -- if invalid user input, send error message
     if not valid_input(user_input) then
         print("Lanuage not configured")
         return
     end
+
+    local user_selection = index(user_input)
+    print(vim.inspect(user_selection))
+
 end
 
+-- print(vim.inspect(index(1)))
 modify()
 
 return M
