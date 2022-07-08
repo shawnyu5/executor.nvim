@@ -53,10 +53,9 @@ function M.executor()
 				-- skip this command
 				if
 					utils.is_dependency(current_command, settings.dependency_commands)
-					and not utils.find_file_in_cwd(current_command)
+					and not utils.find_file_in_cwd(settings.dependency_commands[current_command])
 				then
 					-- if dependency not found, skip command
-					print("continueing..")
 					goto continue
 				end
 
