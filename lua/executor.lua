@@ -13,7 +13,9 @@ local function term_and_excute(command)
 	-- move terminal to 1 before current tab, so closing terminal will land on the currect page
 	vim.cmd("tabm " .. current_tab - 1)
 	vim.fn.chansend(vim.b.terminal_job_id, command)
-	vim.cmd("norm! i")
+	if settings.insert_on_enter then
+		vim.cmd("norm! i")
+	end
 end
 
 --- sets up executor

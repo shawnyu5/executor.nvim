@@ -27,7 +27,8 @@ function M.set_default_values()
 			},
 		},
 		default_mappings = true,
-		always_exit = true, -- always exit terminal no matter status of previous
+		always_exit = true, -- always exit terminal no matter status of previous command
+		insert_on_enter = false, -- enter insert mode on entering a terminal
 		dependency_commands = {
 			make = "makefile",
 		},
