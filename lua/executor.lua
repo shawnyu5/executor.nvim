@@ -1,5 +1,5 @@
 local M = {}
-local Executor_commands = {}
+local settings = {}
 
 local utils = require("utils")
 
@@ -17,20 +17,20 @@ local function term_and_excute(command)
 end
 
 --- sets up executor
----@param settings table the settings for executor
-function M.setup(settings)
+---@param user_settings table the settings for executor
+function M.setup(user_settings)
 	-- if no settings passed in, then set to default values
-	if settings == nil then
-		Executor_commands = utils.set_default_values()
+	if user_settings == nil then
+		settings = utils.set_default_values()
 	else
 		-- else set to settings table passed in
-		Executor_commands = settings
+		settings = user_settings
 	end
 
 	-- if default mappings, map keys
-	if Executor_commands.default_mappings then
-		vim.keymap.set("n", "<leader>m", require("executor").executor(), { silent = false })
-		vim.keymap.set("n", "<leader>ct", require("executor").term_closer(), { silent = false })
+	if settings.default_mappings then
+		vim.keymap.set("n", "<leader>m", require("executor").executor, { silent = false })
+		vim.keymap.set("n", "<leader>ct", require("executor").term_closer, { silent = false })
 	end
 end
 
@@ -40,35 +40,33 @@ function M.executor()
 	-- local current_filetype = vim.bo.filetype
 	local current_filetype = vim.api.nvim_buf_get_option(0, "filetype")
 
-	for filetype, command_tbl in pairs(Executor_commands.commands) do
-		if current_filetype == filetype then
+	for ft, command_tbl in pairs(settings.commands) do
+		if current_filetype == ft then
 			-- loop through command table and excute command
 			for i = 1, #command_tbl do
 				local current_command = command_tbl[i]
-				-- print("current command: ", current_command)
 
-				-- check if current command requires a helper file in cwd, ie `make` -> `makefile`
-				if utils.is_dependency(current_command, Executor_commands.dependency_commands) == false then
-					-- NOTE: must explicately `== false` rather than `not`, other wise nil will be picked up as false too
-
+				-- check if current command requires a dependency file in cwd, ie `make` -> `makefile`
+				if not utils.is_dependency(current_command, settings.dependency_commands) then
 					-- if dependency not found, skip command
 					goto continue
 				end
+
 				-- if extern, execute command in external terminal
 				if command_tbl.extern == false then
 					vim.cmd(current_command)
 					-- stop after command has been excuted
 					return
 				else
-					current_command =
-						utils.replace_filename(current_command, current_file_name, Executor_commands.always_exit)
+					current_command = utils.replace_filename(current_command, current_file_name, settings.always_exit)
 					term_and_excute(current_command .. "\n")
 					return
 				end
 				::continue::
 			end
-			-- if command is excuted, for loop should not finish. Only when there are no commands defined for current filetype the forloop exits.
-			print("No mapping defined")
+			-- if command is excuted, for loop should not finish. Only when there
+			-- are no commands defined for current filetype the forloop exits.
+			vim.notify("No mapping defined for current file type", vim.log.levels.WARN)
 		end
 	end
 end
