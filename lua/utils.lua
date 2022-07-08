@@ -71,7 +71,7 @@ end
 --- check if a file exists
 ---@param name string the file name
 ---@return boolean true if file exists, false otherwise
-function M.validate_cwd_file(name)
+function M.find_file_in_cwd(name)
 	local f = io.open(name, "r")
 	if f ~= nil then
 		io.close(f)

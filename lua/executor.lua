@@ -48,9 +48,15 @@ function M.executor()
 			for i = 1, #command_tbl do
 				local current_command = command_tbl[i]
 
-				-- check if current command requires a dependency file in cwd, ie `make` -> `makefile`
-				if not utils.is_dependency(current_command, settings.dependency_commands) then
+				-- check if current command requires a dependency file in cwd, ie
+				-- `make` -> `makefile`. And the dependency file does not exist,
+				-- skip this command
+				if
+					utils.is_dependency(current_command, settings.dependency_commands)
+					and not utils.find_file_in_cwd(current_command)
+				then
 					-- if dependency not found, skip command
+					print("continueing..")
 					goto continue
 				end
 
