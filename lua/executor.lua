@@ -80,9 +80,6 @@ end
 
 -- exists and closes all term buffers
 function M.term_closer()
-	-- local win_ids = {}
-	-- remember current window
-	-- local current_window = vim.fn.win_getid()
 	local buffers = vim.api.nvim_list_bufs()
 	-- loop through all buffers
 	for _, buffer in ipairs(buffers) do
@@ -92,25 +89,6 @@ function M.term_closer()
 			vim.api.nvim_buf_delete(buffer, { force = true })
 		end
 	end
-
-	-- from tab 1 to last tab open
-	-- for i = 1, vim.fn.tabpagenr("$") do
-	-- -- if buffer is a terminal, we close it
-	-- if vim.fn.gettabwinvar(i, 1, "&buftype") == "terminal" then
-	-- local win_id = vim.fn.win_getid(1, i)
-	-- table.insert(win_ids, win_id)
-	-- end
-	-- end
-
-	-- -- go to all windows, send tell terminal to exit and close tab
-	-- for i = 1, #win_ids do
-	-- vim.fn.win_gotoid(win_ids[i])
-	-- vim.cmd("bd!")
-	-- -- vim.fn.chansend(vim.b.terminal_job_id, "\n\nexit\n") --send exit key
-	-- -- vim.fn.win_execute(win_ids[i], "close") -- close window
-	-- end
-	-- go back to the window we started with
-	-- vim.fn.win_gotoid(current_window)
 end
 
 return M
