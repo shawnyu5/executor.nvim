@@ -69,3 +69,25 @@ describe("utils", function()
 		assert.are.equal("g++ a.cpp && ./a.out && exit || exit", command)
 	end)
 end)
+
+describe("term closer", function()
+	it("should delete all terminal buffers, in the case that they do exist", function()
+		for _ = 1, 4 do
+			local buf = vim.api.nvim_create_buf(true, false)
+			vim.api.nvim_buf_set_option(buf, "buftype", "terminal")
+		end
+
+		for _ = 1, 4 do
+			vim.api.nvim_create_buf(true, false)
+		end
+		executor.term_closer()
+
+		local bufs = vim.api.nvim_list_bufs()
+
+		-- go through all buffers, there should be no terminal buffers
+		for _, buffer in ipairs(bufs) do
+			local buftype = vim.api.nvim_buf_get_option(buffer, "buftype")
+			assert.are_not.equal("terminal", buftype)
+		end
+	end)
+end)
