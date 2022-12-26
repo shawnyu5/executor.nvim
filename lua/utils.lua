@@ -1,7 +1,7 @@
 local M = {}
 
 -- set default values for executor
-function M.set_default_values()
+function M.default_opts()
 	return {
 		commands = {
 			cpp = {
@@ -47,24 +47,14 @@ function M.replace_filename(command, current_file_name, always_exit)
 	end
 end
 
--- check if current command requires a dependency file
 --- check if current command requires a dependency file
 ---@param command string the command to check
 ---@param tbl table the list of dependency commands
 ---@return boolean true if command requires a dependency file, false otherwise
 function M.is_dependency(command, tbl)
-	for current_command, _ in pairs(tbl) do
-		if current_command == command then
-			return true
-			-- if dependency file is not in cwd,  then return false
-			-- if M.validate_cwd_file(dependency) then
-			-- return true
-			-- else
-			-- return false
-			-- end
-		end
+	if tbl[command] ~= nil then
+		return true
 	end
-	-- else if command is not a dependency_command, return nil
 	return false
 end
 

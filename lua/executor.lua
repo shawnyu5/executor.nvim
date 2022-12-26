@@ -19,15 +19,10 @@ local function term_and_excute(command)
 end
 
 --- sets up executor
----@param user_settings table the settings for executor
-function M.setup(user_settings)
+---@param opts table the settings for executor
+function M.setup(opts)
 	-- if no settings passed in, then set to default values
-	if user_settings == nil then
-		settings = utils.set_default_values()
-	else
-		-- else set to settings table passed in
-		settings = user_settings
-	end
+	settings = vim.tbl_deep_extend("force", utils.default_opts(), opts or {})
 
 	-- if default mappings, map keys
 	if settings.default_mappings then
