@@ -1,4 +1,6 @@
 local M = {}
+
+---@class ExecutorOptions
 local settings = {}
 
 local utils = require("utils")
@@ -22,7 +24,7 @@ end
 ---@param opts table the settings for executor
 function M.setup(opts)
 	-- if no settings passed in, then set to default values
-	settings = vim.tbl_deep_extend("force", utils.default_opts(), opts or {})
+	settings = vim.tbl_deep_extend("force", utils.default_opts, opts or {})
 
 	-- if default mappings, map keys
 	if settings.default_mappings then
@@ -31,45 +33,34 @@ function M.setup(opts)
 	end
 end
 
--- excutes file based on file type
+-- runs a command based on the file type
 function M.executor()
-	local current_file_name = vim.fn.expand("%")
-	-- local current_filetype = vim.bo.filetype
-	local current_filetype = vim.api.nvim_buf_get_option(0, "filetype")
+	local file_name = vim.fn.expand("%")
+	local ft = vim.api.nvim_buf_get_option(0, "filetype")
 
-	for ft, command_tbl in pairs(settings.commands) do
-		if current_filetype == ft then
-			-- loop through command table and excute command
-			for i = 1, #command_tbl do
-				local current_command = command_tbl[i]
-
-				-- check if current command requires a dependency file in cwd, ie
-				-- `make` -> `makefile`. And the dependency file does not exist,
-				-- skip this command
-				if
-					utils.is_dependency(current_command, settings.dependency_commands)
-					and not utils.find_file_in_cwd(settings.dependency_commands[current_command])
-				then
-					-- if dependency not found, skip command
-					goto continue
-				end
-
-				-- if extern, execute command in external terminal
-				if command_tbl.extern == false then
-					vim.cmd(current_command)
-					-- stop after command has been excuted
-					return
-				else
-					current_command = utils.replace_filename(current_command, current_file_name, settings.always_exit)
-					term_and_excute(current_command .. "\n")
-					return
-				end
-				::continue::
-			end
-			-- if command is excuted, for loop should not finish. Only when there
-			-- are no commands defined for current filetype the forloop exits.
-			vim.notify("No mapping defined for current file type", vim.log.levels.WARN)
+	---@type table
+	local commandTbl = settings.commands[ft]
+	for _, command in pairs(commandTbl) do
+		if
+			utils.is_dependency(command, settings.dependency_commands)
+			and not utils.find_file_in_cwd(settings.dependency_commands[command])
+		then
+			goto continue
 		end
+
+		-- if not external terminal, run command as a vim command
+		if commandTbl.extern == false then
+			vim.notify(command)
+			vim.cmd(command)
+			-- stop after command has been excuted
+			return
+		else
+			-- spawn a terminal and run command
+			command = utils.replace_filename(command, file_name, settings.always_exit)
+			term_and_excute(command .. "\n")
+			return
+		end
+		::continue::
 	end
 end
 
