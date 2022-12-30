@@ -37,40 +37,6 @@ M.default_opts = {
 		make = "makefile",
 	},
 }
--- ---@return ExecutorSettings
--- function M.default_opts()
--- return {
--- commands = {
--- cpp = {
--- "make",
--- "g++ % && ./a.out",
--- },
--- python = {
--- "python3 %",
--- },
--- javascript = {
--- "node %",
--- },
--- sh = {
--- "bash %",
--- },
--- vim = {
--- "source %",
--- extern = false,
--- },
--- lua = {
--- "luafile %",
--- extern = false,
--- },
--- },
--- default_mappings = true,
--- always_exit = true, -- always exit terminal no matter status of previous command
--- insert_on_enter = false, -- enter insert mode on entering a terminal
--- dependency_commands = {
--- make = "makefile",
--- },
--- }
--- end
 
 --- replace % with current file name and appends ` && exit || exit` to command
 ---@param command string the command to append modify
